@@ -46,23 +46,23 @@ export default function TabsLayout() {
         }}
       />
       
-      {isTrainer ? (
-        <Tabs.Screen
-          name="clients"
-          options={{
-            title: 'Clients',
-            tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
-          }}
-        />
-      ) : (
-        <Tabs.Screen
-          name="my-trainers"
-          options={{
-            title: 'Trainers',
-            tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="my-trainers"
+        options={{
+          title: 'Trainers',
+          tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+          href: !isTrainer ? '/(tabs)/my-trainers' : null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="clients"
+        options={{
+          title: 'Clients',
+          tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+          href: isTrainer ? '/(tabs)/clients' : null,
+        }}
+      />
       
       <Tabs.Screen
         name="workout-plans"
