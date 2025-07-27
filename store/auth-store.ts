@@ -173,6 +173,9 @@ export const useAuthStore = create<AuthState>()(
             email,
             name,
             role,
+            profileImage: role === 'trainer'
+              ? 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000'
+              : 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000',
             location: {
               latitude: 30.2672,
               longitude: -97.7431,
