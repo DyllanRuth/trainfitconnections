@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { Dumbbell, Utensils, Calendar, ArrowRight, Users, Video, Camera, MapPin, RefreshCw, Info } from 'lucide-react-native';
 import { useAuthStore } from '@/store/auth-store';
 import { useClientStore } from '@/store/client-store';
 import { useTrainerStore } from '@/store/trainer-store';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
+import { NotificationBadge } from '@/components/NotificationBadge';
+import { useNotificationCount } from '@/utils/useNotificationCount';
 import Colors from '@/constants/colors';
 import { typography } from '@/styles/typography';
 import { layout } from '@/styles/layout';
@@ -30,7 +32,8 @@ export default function HomeScreen() {
   
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const notificationCount = useNotificationCount();
+
   const isTrainer = user?.role === 'trainer';
   
   // Get current time to display appropriate greeting
@@ -147,6 +150,10 @@ export default function HomeScreen() {
   const navigateToSessionDetails = (sessionId: string) => {
     router.push(`/session/${sessionId}`);
   };
+
+  const handleNotificationPress = () => {
+    router.push('/notifications');
+  };
   
   // Show debug info
   const showDebugInfo = () => {
@@ -203,18 +210,32 @@ export default function HomeScreen() {
   }
   
   return (
-    <ScrollView 
-      style={styles.container} 
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[Colors.primary]}
-          tintColor={Colors.primary}
-        />
-      }
-    >
+    <>
+      <Stack.Screen
+        options={{
+          title: "Home",
+          headerRight: () => (
+            <NotificationBadge
+              count={notificationCount}
+              onPress={handleNotificationPress}
+              size={20}
+              style={styles.notificationButton}
+            />
+          ),
+        }}
+      />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+          />
+        }
+      >
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>{getGreeting()},</Text>
@@ -493,6 +514,7 @@ export default function HomeScreen() {
         <Text style={styles.debugButtonText}>Debug User Info</Text>
       </TouchableOpacity>
     </ScrollView>
+    </>
   );
 }
 
@@ -873,5 +895,8 @@ const styles = StyleSheet.create({
     color: Colors.text.tertiary,
     fontSize: 12,
     marginLeft: 4,
+  },
+  notificationButton: {
+    marginRight: 8,
   },
 });

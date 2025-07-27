@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { Calendar, Plus, Filter, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useAuthStore } from '@/store/auth-store';
 import { useClientStore } from '@/store/client-store';
 import { useTrainerStore } from '@/store/trainer-store';
 import { SessionCard } from '@/components/SessionCard';
 import { Button } from '@/components/Button';
+import { NotificationBadge } from '@/components/NotificationBadge';
+import { useNotificationCount } from '@/utils/useNotificationCount';
 import Colors from '@/constants/colors';
 import { typography } from '@/styles/typography';
 import { Session, Client } from '@/types';
@@ -21,7 +23,8 @@ export default function ScheduleScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed' | 'pending'>('all');
-  
+  const notificationCount = useNotificationCount();
+
   const isTrainer = user?.role === 'trainer';
   const sessions = isTrainer ? trainerSessions : clientSessions;
   const clients = isTrainer ? trainerClients : [];
@@ -122,6 +125,11 @@ export default function ScheduleScreen() {
   const navigateToBookSession = () => {
     router.push('/book-session');
   };
+
+  // Navigate to notifications
+  const handleNotificationPress = () => {
+    router.push('/notifications');
+  };
   
   const filteredSessions = getFilteredSessions();
   
@@ -151,7 +159,21 @@ export default function ScheduleScreen() {
   };
   
   return (
-    <View style={styles.container}>
+    <>
+      <Stack.Screen
+        options={{
+          title: "Schedule",
+          headerRight: () => (
+            <NotificationBadge
+              count={notificationCount}
+              onPress={handleNotificationPress}
+              size={20}
+              style={styles.notificationButton}
+            />
+          ),
+        }}
+      />
+      <View style={styles.container}>
       <View style={styles.calendarHeader}>
         <TouchableOpacity onPress={goToPreviousDay} style={styles.navButton}>
           <ChevronLeft size={24} color={Colors.text.primary} />
@@ -263,6 +285,7 @@ export default function ScheduleScreen() {
         <Plus size={24} color={Colors.text.inverse} />
       </TouchableOpacity>
     </View>
+    </>
   );
 }
 
@@ -382,5 +405,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+  },
+  notificationButton: {
+    marginRight: 8,
   },
 });

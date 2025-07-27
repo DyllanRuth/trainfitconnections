@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { Dumbbell, Search, Filter, Plus } from 'lucide-react-native';
 import { useAuthStore } from '@/store/auth-store';
 import { useClientStore } from '@/store/client-store';
 import { useTrainerStore } from '@/store/trainer-store';
 import { Input } from '@/components/Input';
 import { PlanCard } from '@/components/PlanCard';
+import { NotificationBadge } from '@/components/NotificationBadge';
+import { useNotificationCount } from '@/utils/useNotificationCount';
 import { WorkoutPlan } from '@/types';
 import Colors from '@/constants/colors';
 import { typography } from '@/styles/typography';
@@ -21,6 +23,7 @@ export default function WorkoutPlansScreen() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPlans, setFilteredPlans] = useState<WorkoutPlan[]>([]);
+  const notificationCount = useNotificationCount();
   
   // Mock workout plans data
   const mockWorkoutPlans: WorkoutPlan[] = [
@@ -157,6 +160,10 @@ export default function WorkoutPlansScreen() {
   const handleAddWorkoutPlan = () => {
     router.push('/add-workout-plan');
   };
+
+  const handleNotificationPress = () => {
+    router.push('/notifications');
+  };
   
   // Get client name by ID
   const getClientName = (clientId: string): string => {
@@ -165,7 +172,21 @@ export default function WorkoutPlansScreen() {
   };
   
   return (
-    <View style={[layout.screen, styles.container]}>
+    <>
+      <Stack.Screen
+        options={{
+          title: "Workout Plans",
+          headerRight: () => (
+            <NotificationBadge
+              count={notificationCount}
+              onPress={handleNotificationPress}
+              size={20}
+              style={styles.notificationButton}
+            />
+          ),
+        }}
+      />
+      <View style={[layout.screen, styles.container]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Workout Plans</Text>
         {isTrainer && (
@@ -248,6 +269,7 @@ export default function WorkoutPlansScreen() {
         </View>
       )}
     </View>
+    </>
   );
 }
 
@@ -358,5 +380,8 @@ const styles = StyleSheet.create({
   addPlanText: {
     color: Colors.text.inverse,
     fontWeight: '500',
+  },
+  notificationButton: {
+    marginRight: 8,
   },
 });

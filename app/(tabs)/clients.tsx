@@ -6,6 +6,8 @@ import { useTrainerStore } from '@/store/trainer-store';
 import { useAuthStore } from '@/store/auth-store';
 import { Input } from '@/components/Input';
 import { Card } from '@/components/Card';
+import { NotificationBadge } from '@/components/NotificationBadge';
+import { useNotificationCount } from '@/utils/useNotificationCount';
 import { Client } from '@/types';
 import Colors from '@/constants/colors';
 
@@ -14,6 +16,7 @@ export default function ClientsScreen() {
   const { clients } = useTrainerStore();
   const { user } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
+  const notificationCount = useNotificationCount();
   
   // Redirect non-trainers away from this page
   useEffect(() => {
@@ -42,6 +45,10 @@ export default function ClientsScreen() {
   const handleAddClient = () => {
     // Navigate to add client screen
     router.push('/add-client');
+  };
+
+  const handleNotificationPress = () => {
+    router.push('/notifications');
   };
   
   const renderClientItem = ({ item }: { item: Client }) => (
@@ -89,16 +96,24 @@ export default function ClientsScreen() {
   
   return (
     <View style={styles.container}>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           title: "Clients",
           headerRight: () => (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddClient}
-            >
-              <Plus size={20} color={Colors.text.inverse} />
-            </TouchableOpacity>
+            <View style={styles.headerRight}>
+              <NotificationBadge
+                count={notificationCount}
+                onPress={handleNotificationPress}
+                size={20}
+                style={styles.notificationButton}
+              />
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddClient}
+              >
+                <Plus size={20} color={Colors.text.inverse} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
@@ -171,6 +186,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.text.primary,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  notificationButton: {
+    marginRight: 4,
   },
   addButton: {
     width: 40,

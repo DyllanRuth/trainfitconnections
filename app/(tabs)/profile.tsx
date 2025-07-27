@@ -340,9 +340,9 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             )}
             
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => router.push('/(tabs)/notifications')}
+              onPress={() => router.push('/notifications')}
             >
               <View style={styles.menuIconContainer}>
                 <Bell size={20} color={Colors.primary} />
